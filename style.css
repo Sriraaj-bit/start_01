@@ -1,0 +1,28 @@
+/* Creative atmospheric background */
+html,
+body {
+	min-height: 100%;
+}
+
+body {
+	margin: 0;
+	color: #f7f4ff;
+	background:
+		radial-gradient(ellipse at 18% 20%, rgba(255, 111, 145, 0.38), transparent 38%),
+		radial-gradient(ellipse at 82% 24%, rgba(87, 214, 255, 0.28), transparent 35%),
+		radial-gradient(ellipse at 58% 90%, rgba(160, 102, 255, 0.34), transparent 42%),
+		linear-gradient(135deg, #11152d 0%, #25204a 48%, #101b35 100%);
+	background-attachment: fixed;
+}
+
+body::before {
+	position: fixed;
+	z-index: -1;
+	inset: 0;
+	content: "";
+	pointer-events: none;
+	opacity: 0.22;
+	background-image: radial-gradient(rgba(255, 255, 255, 0.7) 0.7px, transparent 0.9px);
+	background-size: 22px 22px;
+	mask-image: linear-gradient(to bottom, #000, transparent 85%);
+}
