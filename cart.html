@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shopping Cart</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #202820; font: 16px/1.5 system-ui, sans-serif; background: #fff; }
+    header { border-bottom: 1px solid #e4e8e4; }
+    nav { max-width: 1050px; margin: auto; padding: 18px 24px; display: flex; justify-content: space-between; }
+    nav a { color: #236844; text-decoration: none; font-weight: 650; }
+    main { max-width: 1050px; margin: 42px auto; padding: 0 24px; }
+    h1 { margin: 0; font-size: 2.2rem; letter-spacing: -.04em; }
+    .intro { color: #66716a; margin: 6px 0 28px; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(260px, .9fr); gap: 32px; align-items: start; }
+    .product { display: grid; grid-template-columns: 84px 1fr auto; gap: 16px; align-items: center; padding: 20px 0; border-top: 1px solid #e4e8e4; }
+    .photo { width: 84px; height: 84px; border-radius: 9px; background: #f0f5f0; display: grid; place-items: center; font-size: 2rem; }
+    h2 { margin: 0 0 4px; font-size: 1rem; }
+    .detail { margin: 0 0 10px; color: #66716a; font-size: .9rem; }
+    .controls { display: flex; align-items: center; gap: 12px; }
+    .qty { display: inline-flex; align-items: center; border: 1px solid #dce2dc; border-radius: 6px; }
+    .qty button { width: 31px; height: 30px; border: 0; background: transparent; cursor: pointer; font: inherit; }
+    .qty output { min-width: 24px; text-align: center; }
+    .remove { padding: 2px; border: 0; background: transparent; color: #66716a; cursor: pointer; text-decoration: underline; }
+    .price { align-self: start; font-weight: 700; white-space: nowrap; }
+    .summary { padding: 22px; border: 1px solid #e0e6e0; border-radius: 10px; }
+    .summary h2 { font-size: 1.2rem; margin-bottom: 18px; }
+    .row { display: flex; justify-content: space-between; margin: 12px 0; color: #66716a; }
+    .total { padding-top: 15px; border-top: 1px solid #e4e8e4; color: #202820; font-size: 1.1rem; font-weight: 700; }
+    .checkout { width: 100%; padding: 13px; border: 0; border-radius: 6px; background: #236844; color: white; font: inherit; font-weight: 650; cursor: pointer; }
+    .checkout:hover { background: #194f34; }
+    .note { color: #66716a; font-size: .82rem; text-align: center; }
+    .empty { padding: 32px 0; color: #66716a; }
+    @media (max-width: 680px) { main { margin: 28px auto; } .grid { grid-template-columns: 1fr; gap: 24px; } }
+    @media (max-width: 390px) { .product { grid-template-columns: 64px 1fr; gap: 12px; } .photo { width: 64px; height: 64px; } .price { grid-column: 2; } }
+  </style>
+</head>
+<body>
+  <header><nav aria-label="Main navigation"><a href="#">Good Goods</a><a href="#cart">Cart (<span id="nav-count">3</span>)</a></nav></header>
+  <main id="cart">
+    <h1>Your cart</h1>
+    <p class="intro" id="message">You have 3 items in your cart.</p>
+    <div class="grid">
+      <section id="products" aria-label="Cart items">
+        <article class="product" data-price="32">
+          <div class="photo" aria-hidden="true">☕</div><div><h2>Everyday Ceramic Mug</h2><p class="detail">Stoneware · Forest green</p><div class="controls"><div class="qty"><button type="button" data-step="-1" aria-label="Decrease mug quantity">−</button><output>1</output><button type="button" data-step="1" aria-label="Increase mug quantity">+</button></div><button class="remove" type="button">Remove</button></div></div><div class="price">$<span class="line-total">32.00</span></div>
+        </article>
+        <article class="product" data-price="24.50">
+          <div class="photo" aria-hidden="true">📓</div><div><h2>Recycled Paper Notebook</h2><p class="detail">A5 · Set of 2</p><div class="controls"><div class="qty"><button type="button" data-step="-1" aria-label="Decrease notebook quantity">−</button><output>2</output><button type="button" data-step="1" aria-label="Increase notebook quantity">+</button></div><button class="remove" type="button">Remove</button></div></div><div class="price">$<span class="line-total">49.00</span></div>
+        </article>
+      </section>
+      <aside class="summary" aria-label="Order summary"><h2>Order summary</h2><div class="row"><span>Subtotal</span><span id="subtotal">$81.00</span></div><div class="row"><span>Shipping</span><span id="shipping">$5.00</span></div><div class="row total"><span>Total</span><span id="total">$86.00</span></div><button type="button" class="checkout" id="checkout">Continue to checkout</button><p class="note">Free shipping on orders over $100.</p></aside>
+    </div>
+  </main>
+  <script>
+    const products = document.getElementById('products');
+    const formatMoney = value => '$' + value.toFixed(2);
+    function updateCart() {
+      const rows = [...products.querySelectorAll('.product')];
+      let count = 0, subtotal = 0;
+      rows.forEach(row => {
+        const quantity = Number(row.querySelector('output').textContent);
+        const line = Number(row.dataset.price) * quantity;
+        count += quantity;
+        subtotal += line;
+        row.querySelector('.line-total').textContent = line.toFixed(2);
+      });
+      const shipping = subtotal === 0 || subtotal >= 100 ? 0 : 5;
+      document.getElementById('nav-count').textContent = count;
+      document.getElementById('message').textContent = `You have ${count} item${count === 1 ? '' : 's'} in your cart.`;
+      document.getElementById('subtotal').textContent = formatMoney(subtotal);
+      document.getElementById('shipping').textContent = shipping ? formatMoney(shipping) : (subtotal ? 'Free' : '$0.00');
+      document.getElementById('total').textContent = formatMoney(subtotal + shipping);
+      if (!count) products.innerHTML = '<p class="empty">Your cart is empty. Add something you love to get started.</p>';
+    }
+    products.addEventListener('click', event => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      const row = button.closest('.product');
+      if (button.classList.contains('remove')) row.remove();
+      else {
+        const output = row.querySelector('output');
+        const next = Number(output.textContent) + Number(button.dataset.step);
+        if (next < 1) return;
+        output.textContent = next;
+      }
+      updateCart();
+    });
+    document.getElementById('checkout').addEventListener('click', () => {
+      if (products.querySelector('.product')) alert('Checkout is ready to connect to your store.');
+    });
+  </script>
+</body>
+</html>
