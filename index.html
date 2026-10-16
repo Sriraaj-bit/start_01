@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shopping Cart</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; color: #222; background: #f4f5f7; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: #fff; box-shadow: 0 2px 8px #0001; }
+    header h1 { margin: 0; font-size: 1.4rem; }
+    main { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+    .layout { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; }
+    .products, .cart { padding: 1.25rem; background: #fff; border-radius: 10px; }
+    h2 { margin-top: 0; }
+    .product { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #eee; }
+    .product:last-child { border: 0; }
+    .product p { margin: .4rem 0 0; color: #666; }
+    button { padding: .65rem .9rem; color: #fff; background: #1769e0; border: 0; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #1055b8; }
+    #cart-items { list-style: none; margin: 0; padding: 0; }
+    #cart-items li { display: flex; justify-content: space-between; gap: .5rem; padding: .7rem 0; border-bottom: 1px solid #eee; }
+    #cart-items .empty { color: #666; }
+    .total { display: flex; justify-content: space-between; margin: 1rem 0; font-weight: bold; }
+    @media (max-width: 650px) { .layout { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Simple Shop</h1>
+    <span aria-live="polite">Cart (<strong id="cart-count">0</strong>)</span>
+  </header>
+  <main>
+    <h2>Products</h2>
+    <div class="layout">
+      <section class="products" aria-label="Products">
+        <article class="product"><div><strong>Classic T-Shirt</strong><p>$19.99</p></div><button type="button" data-name="Classic T-Shirt" data-price="19.99">Add to cart</button></article>
+        <article class="product"><div><strong>Everyday Backpack</strong><p>$39.99</p></div><button type="button" data-name="Everyday Backpack" data-price="39.99">Add to cart</button></article>
+        <article class="product"><div><strong>Travel Mug</strong><p>$12.50</p></div><button type="button" data-name="Travel Mug" data-price="12.50">Add to cart</button></article>
+      </section>
+      <aside class="cart" aria-label="Shopping cart">
+        <h2>Your cart</h2>
+        <ul id="cart-items"><li class="empty">Your cart is empty.</li></ul>
+        <div class="total"><span>Total</span><span id="cart-total">$0.00</span></div>
+        <button type="button" id="checkout">Checkout</button>
+      </aside>
+    </div>
+  </main>
+  <script>
+    const cart = new Map();
+    const itemList = document.getElementById('cart-items');
+
+    function updateCart() {
+      itemList.replaceChildren();
+      let count = 0;
+      let total = 0;
+      if (cart.size === 0) {
+        const empty = document.createElement('li');
+        empty.className = 'empty';
+        empty.textContent = 'Your cart is empty.';
+        itemList.append(empty);
+      }
+      for (const [name, item] of cart) {
+        count += item.quantity;
+        total += item.price * item.quantity;
+        const row = document.createElement('li');
+        row.append(document.createTextNode(`${name} × ${item.quantity}`));
+        const price = document.createElement('span');
+        price.textContent = `$${(item.price * item.quantity).toFixed(2)}`;
+        row.append(price);
+        itemList.append(row);
+      }
+      document.getElementById('cart-count').textContent = count;
+      document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+    }
+
+    document.querySelectorAll('.product button').forEach(button => {
+      button.addEventListener('click', () => {
+        const name = button.dataset.name;
+        const item = cart.get(name) || { price: Number(button.dataset.price), quantity: 0 };
+        item.quantity += 1;
+        cart.set(name, item);
+        updateCart();
+      });
+    });
+
+    document.getElementById('checkout').addEventListener('click', () => {
+      if (cart.size === 0) {
+        alert('Your cart is empty.');
+        return;
+      }
+      alert(`Thanks for shopping! Your total is ${document.getElementById('cart-total').textContent}.`);
+      cart.clear();
+      updateCart();
+    });
+  </script>
+</body>
+</html>
